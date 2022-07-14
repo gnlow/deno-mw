@@ -2,7 +2,7 @@ import { Lw } from "https://denopkg.com/gnlow/lazywrap@main/mod.ts"
 
 import urlcat, { ParamMap } from "https://deno.land/x/urlcat/src/index.ts"
 
-import type { ApiEditPageParams } from "https://cdn.skypack.dev/types-mediawiki/api_params?dts"
+import type * as T from "https://cdn.skypack.dev/types-mediawiki/api_params?dts"
 
 import {
   CookieJar,
@@ -98,14 +98,20 @@ export class Bot {
         .then(res => res.query.tokens.csrftoken)
     }
 
-    async edit(options: ApiEditPageParams) {
+    async edit(options: T.ApiEditPageParams) {
         return await this.POST({
             action: "edit",
             token: await this.csrfToken,
-
-            bot: true,
             ...options
         })
-        .then(res => res.text())
+        .then(res => res.json())
+    }
+    async upload(options: T.ApiUploadParams) {
+        return await this.POST({
+            action: "upload",
+            token: await this.csrfToken,
+            ...options
+        })
+        .then(res => res.json())
     }
 }
