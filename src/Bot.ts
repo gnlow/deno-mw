@@ -69,6 +69,27 @@ export class Bot {
             }
         )
     }
+    async POST_multipart(params: ParamMap) {
+        const {
+            action,
+            ...rest
+        } = params
+        const formData = new FormData()
+        Object.entries(rest).forEach(
+            ([name, value]) => formData.append(name, value)
+        )
+        return await this.fetch(
+            urlcat(this.apiUrl, {action, format: "json"}),
+            {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "user-agent": this.userAgent,
+                    //"content-type": "application/x-www-form-urlencoded",
+                }
+            }
+        )
+    }
 
     async getLoginToken() {
         return this.loginToken = await this.GET({
@@ -106,8 +127,16 @@ export class Bot {
         })
         .then(res => res.json())
     }
+    /**
+     * ```
+     * await testBot.upload({
+     *      filename: "file.svg",
+     *      file: new Blob([await Deno.readFile("world_opt.svg")]),
+     *  })
+     * ```
+     */
     async upload(options: T.ApiUploadParams) {
-        return await this.POST({
+        return await this.POST_multipart({
             action: "upload",
             token: await this.csrfToken,
             ...options

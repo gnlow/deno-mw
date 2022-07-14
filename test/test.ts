@@ -10,7 +10,9 @@ const testBot = new Bot({
 
 console.log(await testBot.login())
 console.log(await testBot.csrfToken)
+/*
 console.log(await testBot.edit({
     title: "연습장:Gnlow/API",
     text: "TESTTTT"
 }))
+*/
