@@ -34,7 +34,7 @@ export class Bot {
         this.apiUrl = options.apiUrl
         this.username = options.username
         this.password = options.password
-        this.userAgent = options.userAgent
+        this.userAgent = `${options.userAgent} deno-mw/0.1.0`
     }
     
     async GET(params: ParamMap) {
@@ -42,7 +42,7 @@ export class Bot {
             urlcat(this.apiUrl, params),
             {
                 headers: {
-                    "user-agent": `${this.userAgent} deno-mw/0.1.0`
+                    "user-agent": this.userAgent,
                 }
             }
         )
@@ -60,8 +60,7 @@ export class Bot {
                 body: urlcat("", rest),
                 headers: {
                     "user-agent": this.userAgent,
-                    "content-type": "application/x-www-form-urlencoded"
-
+                    "content-type": "application/x-www-form-urlencoded",
                 }
             }
         )
