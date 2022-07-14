@@ -2,6 +2,8 @@ import { Lw } from "https://denopkg.com/gnlow/lazywrap@main/mod.ts"
 
 import urlcat, { ParamMap } from "https://deno.land/x/urlcat/src/index.ts"
 
+import type { ApiEditPageParams } from "https://cdn.skypack.dev/types-mediawiki/api_params?dts"
+
 import {
   CookieJar,
   wrapFetch,
@@ -39,7 +41,10 @@ export class Bot {
     
     async GET(params: ParamMap) {
         return await this.fetch(
-            urlcat(this.apiUrl, params),
+            urlcat(this.apiUrl, {
+                ...params,
+                format: "json"
+            }),
             {
                 headers: {
                     "user-agent": this.userAgent,
@@ -50,11 +55,10 @@ export class Bot {
     async POST(params: ParamMap) {
         const {
             action,
-            format,
             ...rest
         } = params
         return await this.fetch(
-            urlcat(this.apiUrl, {action, format}),
+            urlcat(this.apiUrl, {action, format: "json"}),
             {
                 method: "POST",
                 body: urlcat("", rest),
@@ -82,7 +86,6 @@ export class Bot {
             lgname: this.username,
             lgpassword: this.password,
             lgtoken: await this.loginToken,
-            format: "json",
         })
         .then(res => res.json())
     }
@@ -90,20 +93,19 @@ export class Bot {
         return this.csrfToken = await this.GET({
             action: "query",
             meta: "tokens",
-            format: "json",
         })
         .then(res => res.json())
         .then(res => res.query.tokens.csrftoken)
     }
-    async editRequest() {
+
+    async edit(options: ApiEditPageParams) {
         return await this.POST({
             action: "edit",
-            title: "연습장:Gnlow/API",
-            appendtext: "테스트~~~~!",
             token: await this.csrfToken,
-            format: "json",
+
+            bot: true,
+            ...options
         })
         .then(res => res.text())
-        .catch(e => {throw e})
     }
 }
